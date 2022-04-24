@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="upCharacter mediumfadeInRight">
-                <img :src="'http://localhost:25565/characters/'+Limits.limits[banner].star5+'.png'" alt="" class="up">
+                <img :src="'http://localhost:25565/characters/5_'+Limits.limits[banner].star5.split('_')[1]+'.png'" alt="" class="up">
             </div>
             <div class="characterInfo">
                 <div class="infoTitle">
@@ -38,7 +38,7 @@
                 <p class="slogan">{{Limits.limits[banner].slogan}}</p>
             </div>
             <div class="subCharacter smallfadeInRight">
-                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="'http://localhost:25565/characters/withoutBackground/'+character+'.png'" :alt="character" :class="'character'+i">
+                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="'http://localhost:25565/characters/withoutBackground/4_'+character.split('_')[1]+'.png'" :alt="character" :class="'character'+i">
             </div>
         </div>
     </div>
