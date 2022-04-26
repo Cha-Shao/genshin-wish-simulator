@@ -2,7 +2,7 @@
     <div class="container animated mediumfadeInRight">
         <div class="remarks mediumfadeInRight" :style="'background: #'+Limits.limits[banner].color+';'">角色活动祈愿</div>
         <div class="banner"
-            :style="'background: url(http://localhost:25565/ui/banners/banner-'+Limits.limits[banner].attribute+'.png)'"
+            :style="'background: url(http://192.168.43.16:25565/ui/banners/banner-'+Limits.limits[banner].attribute+'.png)'"
         >
             <div class="contents smallfadeInRight">
                 <div class="title textOutline">
@@ -13,7 +13,7 @@
                 </div>
                 <div class="describe">
                     <p class="rateUp textOutline">获取概率提升！</p>
-                    <p :style="'background-color: #'+Limits.limits[banner].color+';'" class="mustHave">
+                    <p :style="'background-color: #'+Limits.limits[banner].color+'dd;'" class="mustHave">
                     <img src="@/assets/ui/icons/star.svg" alt="×" style="height: 1em;margin-right: 7px;">
                     每十次祈愿必出四星或以上物品。</p>
                     <p  class="more textOutline">活动限定五星角色仅在UP期间，通过对应祈愿获得。具体内容查看【详情】</p>
@@ -24,11 +24,11 @@
                 </div>
             </div>
             <div class="upCharacter mediumfadeInRight">
-                <img :src="'http://localhost:25565/characters/5_'+Limits.limits[banner].star5.split('_')[1]+'.png'" alt="" class="up">
+                <img :src="'http://192.168.43.16:25565/characters/5-'+Limits.limits[banner].star5.split('-')[1]+'.png'" alt="" class="up">
             </div>
             <div class="characterInfo">
                 <div class="infoTitle">
-                    <img :src="'http://localhost:25565/ui/icons/'+Limits.limits[banner].attribute+'-color.png'" alt="">
+                    <img :src="'http://192.168.43.16:25565/ui/icons/'+Limits.limits[banner].attribute+'-color.webp'" alt="">
                     <div class="title darkTextOutLine">{{Limits.limits[banner].name}}</div>
                 </div>
                 <div class="rarityBG">
@@ -38,7 +38,7 @@
                 <p class="slogan">{{Limits.limits[banner].slogan}}</p>
             </div>
             <div class="subCharacter smallfadeInRight">
-                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="'http://localhost:25565/characters/withoutBackground/4_'+character.split('_')[1]+'.png'" :alt="character" :class="'character'+i">
+                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="'http://192.168.43.16:25565/characters/withoutBackground/4-'+character.split('-')[1]+'.png'" :alt="character" :class="'character'+i">
             </div>
         </div>
     </div>

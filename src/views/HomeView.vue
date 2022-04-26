@@ -48,14 +48,33 @@
   </div>
 
   <!-- 视频页 -->
-  <video v-if="wishing" :src="'http://localhost:25565/video/'+resultVideo+'.mp4'" autoplay
+  <video v-if="wishing" :src="'http://192.168.43.16:25565/video/'+resultVideo+'.mp4'" autoplay
   class="watchVideo"/>
+
+  <!-- 预览页 -->
+  <div class="viewPage" v-if="viewPage">
+    
+  </div>
 
   <!-- 结果页 -->
   <div class="resultPage" v-if="resultPage">
+    <div class="close" @click="closeResultPage()"/>
     <div class="result resultfadeInRight" v-for="(results, i) in result" :key="i"
-    :style="'animation-delay: '+i*2/10+'s;'">
-      <img :src="'http://localhost:25565/characters/'+results.split('_')[0]+'_'+results.split('_')[1]+'.png'" alt="">
+    :style="'animation-delay: '+i/10+'s;'">
+      <img :src="'http://192.168.43.16:25565/ui/icons/'+results.split('-')[2]+'-color.webp'" alt="" class="attribute" height="90">
+      <div class="raritys" style="
+          position: absolute;
+          z-index: 2;
+          top: 87%;
+          left: 50%;
+          transform: translateX(-50%);
+          "
+          >
+        <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity"
+        v-for="i in Number(results.split('-')[0])" :key="i" height="23"
+        style="margin: -2px">
+      </div>
+      <img :src="'http://192.168.43.16:25565/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png'" alt="" class="characterResult">
     </div>
   </div>
 </template>
@@ -68,14 +87,14 @@ import { ref } from 'vue'
 import Limits from '@/limits'
 
 
-let goldRank = 6
-
 
 const isSwitch = ref(0)
 // 首页
 const homePage = ref(true)
 // 放视频
 const wishing = ref(false)
+// 预览页
+const viewPage = ref(false)
 //结果页
 const resultPage = ref(false)
 // 默认视频
@@ -90,6 +109,18 @@ let minimumGuarantee = ref(0)
 
 // 初始化卡池结果
 let result = ref([])
+// let result = ref([
+//     "4-Yanfei-fire",
+//     "4-Yanfei-fire",
+//     "3-Slingshot-bow",
+//     "3-Skyrider_Sword-sword",
+//     "3-Messenger-bow",
+//     "3-Fillet_Blade-sword",
+//     "3-Ferrous_Shadow-sword",
+//     "3-Emerald_Orb-magic",
+//     "3-Black_Tassel-pike",
+//     "3-Black_Tassel-pike"
+// ])
 
 let defaultResult = {
   star5: [],
@@ -125,7 +156,6 @@ function switchMode(i, type) {
   defaultResult = {
     star5: [],
     star4: [],
-    star4Weapon: [],
     star3: [],
   }
   importResult()
@@ -142,7 +172,7 @@ function importResult() {
       defaultResult[i].push(item)
     })
   }
-  console.log(defaultResult);
+  // console.log(defaultResult);
 }
 importResult()
 
@@ -196,11 +226,11 @@ function startWish(time) {
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
       // 出金
-      case (0 <= random && random < goldRank):
+      case (0 <= random && random < 10):
         result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
         break;
       // 出紫
-      case (6 <= random && random < 130):
+      case (6 <= random && random < 100):
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
       // 出蓝
@@ -208,6 +238,11 @@ function startWish(time) {
         result.value.push(defaultResult.star3[Math.floor(Math.random() * defaultResult.star3.length)])
         break;
     }
+  }
+  if (result.value.toString().indexOf(Limits.limits[wishUper.value].star5.split('-')[1].toString()) != -1) {
+    minimumGuarantee.value = 0
+    localStorage.setItem('minimumGuarantee',0)
+    console.log('重置保底');
   }
   // 排序result
   result.value.sort()
@@ -218,31 +253,28 @@ function startWish(time) {
 function watchVideo(time, result) {
   console.log(time, result);
   if (time == 1) {
-    console.log('单发');
     switch (true) {
-      case (result.value[0].split('_')[0] == 5):
+      case (result.value[0].split('-')[0] == 5):
         // 出金
         resultVideo.value = '5starwish-single-export'
         break;
-      case (result.value[0].split('_')[0] == 4):
+      case (result.value[0].split('-')[0] == 4):
         // 出紫
         resultVideo.value = '4starwish-single-export'
         break;
-      case (result.value[0].split('_')[0] == 3):
+      case (result.value[0].split('-')[0] == 3):
         // 出蓝
         resultVideo.value = '3starwish-single-export'
         break;
     }
   }
   else {
-    console.log('十连');
     switch (true) {
-      case (result.value[0].split('_')[0] == 5):
+      case (result.value[0].split('-')[0] == 5):
         // 出金
-        console.log('出金');
         resultVideo.value = '5starwish-export'
         break;
-      case (result.value[0].split('_')[0] == 4):
+      case (result.value[0].split('-')[0] == 4):
         // 出紫
         resultVideo.value = '4starwish-export'
         break;
@@ -266,6 +298,11 @@ function supplement(time){
 function setMinimumGuarantee(){
   minimumGuarantee.value = 170
   localStorage.setItem('minimumGuarantee',170)
+}
+
+function closeResultPage(){
+  resultPage.value = false
+  homePage.value = true
 }
 </script>
 
@@ -326,10 +363,10 @@ $grayfont: #B4A08C;
     display: flex;
     justify-content: center;
     .switched{
-      background: url('../assets/ui/button-active.png') no-repeat;
+      background: url('../assets/ui/buttons/button-active.png') no-repeat;
       transform: scale(1.1);
       &::after{
-        background: url(../assets/ui/button-active-after.png);
+        background: url(../assets/ui/buttons/button-active-after.png);
       }
       .character{
         transform: translateY(-6px);
@@ -379,7 +416,7 @@ $grayfont: #B4A08C;
     .wishButtons{
       display: flex;
       div{
-        background: url('@/assets/ui/wish-button.png') no-repeat;
+        background: url('@/assets/ui/buttons/wish-button.png') no-repeat;
         height: 82px;
         width: 350px;
         text-align: center;
@@ -409,27 +446,53 @@ $grayfont: #B4A08C;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: url('@/assets/ui/result-background.png');
+  position: relative;
+  overflow: hidden;
   .result{
     overflow: hidden;
     height: 630px;
     width: 145px;
-    background: url('http://localhost:25565/ui/wishresult.svg') no-repeat;
+    background: url('http://192.168.43.16:25565/ui/wishresult.svg') no-repeat;
     background-size: 100%;
-    margin: 0 10px;
+    margin: 0 2px;
     flex-shrink: 0;
-    img{
-      width: 220%;
-      height: 220%;
+    position: relative;
+    .attribute{
+      position: absolute;
+      z-index: 2;
+      top: 70%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .raritys{
+      display: flex;
+      .rarity{
+
+      }
+    }
+    .characterResult{
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       object-position: center center;
       position: relative;
-      top: -20%;
+      top: 0%;
       background-size: contain;
       mask-image: url('@/assets/ui/wishresult-mask.png');
-      mask-position: 0 125px;
+      mask-position: 0 -1px;
       mask-repeat: no-repeat;
     }
   }
+}
+
+.close{
+  position: absolute;
+  height: 58px;
+  width: 58px;
+  background: url('@/assets/ui/close.png');
+  top: 58px;
+  right: 58px;
 }
 
 @keyframes resultfadeInRight {
