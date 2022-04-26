@@ -48,12 +48,25 @@
   </div>
 
   <!-- 视频页 -->
-  <video v-if="wishing" :src="'http://192.168.43.16:25565/video/'+resultVideo+'.mp4'" autoplay
+  <video v-if="wishing" :src="'http://localhost:25565/video/'+resultVideo+'.mp4'" autoplay
   class="watchVideo"/>
 
   <!-- 预览页 -->
-  <div class="viewPage" v-if="viewPage">
-    
+  <div class="viewPage" v-if="viewPage" @click="nextItem()">
+    <audio src="http://localhost:25565/video/result.mp3" ref="resultSound"></audio>
+    <p class="skip" @click="skipView()">跳过 ></p>
+    <div class="viewItems" v-for="(items, i) in result" :key="i"
+    v-show="nowView === i">
+      <div class="info titleFadeIn">
+        <h1>{{items.split('-')[3]}}</h1>
+        <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity starFadeIn"
+        :style="'animation-delay: '+(0.5+i/10)+'s;'"
+        v-for="i in Number(items.split('-')[0])" :key="i" height="35"
+        style="margin: -2px">
+      </div>
+      <img :src="'http://localhost:25565/ui/viewpage/'+items.split('-')[2]+'.png'" alt="" class="viewItemBackground itemBackground">
+      <img :src="'http://localhost:25565/characters/'+items.split('-')[0]+'-'+items.split('-')[1]+'.png'" alt="" class="viewItem itemFadeIn">
+    </div>
   </div>
 
   <!-- 结果页 -->
@@ -61,7 +74,7 @@
     <div class="close" @click="closeResultPage()"/>
     <div class="result resultfadeInRight" v-for="(results, i) in result" :key="i"
     :style="'animation-delay: '+i/10+'s;'">
-      <img :src="'http://192.168.43.16:25565/ui/icons/'+results.split('-')[2]+'-color.webp'" alt="" class="attribute" height="90">
+      <img :src="'http://localhost:25565/ui/icons/'+results.split('-')[2]+'-color.webp'" alt="" class="attribute" height="90">
       <div class="raritys" style="
           position: absolute;
           z-index: 2;
@@ -74,7 +87,7 @@
         v-for="i in Number(results.split('-')[0])" :key="i" height="23"
         style="margin: -2px">
       </div>
-      <img :src="'http://192.168.43.16:25565/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png'" alt="" class="characterResult">
+      <img :src="'http://localhost:25565/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png'" alt="" class="characterResult">
     </div>
   </div>
 </template>
@@ -95,6 +108,8 @@ const homePage = ref(true)
 const wishing = ref(false)
 // 预览页
 const viewPage = ref(false)
+const nowView = ref(0)
+let resultSound = ref(null)
 //结果页
 const resultPage = ref(false)
 // 默认视频
@@ -211,30 +226,26 @@ function startWish(time) {
     minimumGuarantee.value -= -1
     localStorage.setItem('minimumGuarantee',minimumGuarantee.value)
 
+    // 生成0到1000的随机数
+    
     let random = Math.floor(Math.random() * 1000)
     switch (true) {
-      // 大保底
       case (minimumGuarantee.value % 180 == 0):
         result.value.push(Limits.limits[wishUper.value].star5)
         break
-      // 小保底
       case (minimumGuarantee.value % 90 == 0):
         result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
         break
-      // 紫保底
-      case (minimumGuarantee.value % 10 == 0):
+      case (minimumGuarantee.value % 10 == 9):
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
-      // 出金
       case (0 <= random && random < 10):
         result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
         break;
-      // 出紫
       case (6 <= random && random < 100):
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
-      // 出蓝
-      case (130 <= random && random < 1000):
+      case (100 <= random && random < 1000):
         result.value.push(defaultResult.star3[Math.floor(Math.random() * defaultResult.star3.length)])
         break;
     }
@@ -244,14 +255,12 @@ function startWish(time) {
     localStorage.setItem('minimumGuarantee',0)
     console.log('重置保底');
   }
-  // 排序result
-  result.value.sort()
-  result.value.reverse()
   watchVideo(time, result)
 }
 
 function watchVideo(time, result) {
   console.log(time, result);
+  console.log('看视频');
   if (time == 1) {
     switch (true) {
       case (result.value[0].split('-')[0] == 5):
@@ -269,25 +278,55 @@ function watchVideo(time, result) {
     }
   }
   else {
+    console.log('多发');
     switch (true) {
-      case (result.value[0].split('-')[0] == 5):
+      case (result.value.toString().indexOf('5-') != -1):
         // 出金
+        console.log('出金');
         resultVideo.value = '5starwish-export'
         break;
-      case (result.value[0].split('-')[0] == 4):
+      default:
         // 出紫
+        console.log('出紫');
         resultVideo.value = '4starwish-export'
         break;
     }
   }
   wishing.value = true
   homePage.value = false
-  // 6s后停止播放
+  // 重置预览编号
+  nowView.value = 0
+  // 6s后跳转
   setTimeout(() => {
     wishing.value = false
-    // 切换到结果页
-    resultPage.value = true
+    // 切换到预览页
+    viewPage.value = true
+
+    console.log(resultSound.value);
+    
   }, 6000)
+}
+
+// 下一个物品预览
+function nextItem(){
+
+  nowView.value -= -1
+  if (nowView.value == 10) {
+    skipView()
+  }
+}
+
+//跳过
+function skipView() {
+    nowView.value = 0
+    viewPage.value = false
+    resultPage.value = true
+    
+    // 排序result
+    result.value.sort()
+    result.value.reverse()
+    viewPage.value = false
+    resultPage.value = true
 }
 
 // 投喂
@@ -441,6 +480,48 @@ $grayfont: #B4A08C;
   object-fit: cover;
   object-position: center center;
 }
+
+.viewPage{
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: url('@/assets/ui/result-background.png');
+  position: relative;
+  .skip{
+    position: absolute;
+    top: 30px;
+    right: 50px;
+    font-size: 1.5em;
+    z-index: 3;
+    color: white;
+  }
+  .viewItems{
+    display: flex;
+    justify-content: center;
+    .info{
+      position: absolute;
+      z-index: 2;
+      left: 10%;
+      top: 50%;
+      h1{
+        font-size: 4em;
+        color: white;
+        margin: 0;
+        text-shadow: none;
+        font-weight: normal;
+      }
+    }
+    .viewItemBackground{
+      height: 100vh;
+      opacity: 0;
+    }
+    .viewItem{
+      position: absolute;
+      height: 100vh;
+    }
+  }
+}
+
 .resultPage{
   display: flex;
   justify-content: center;
@@ -453,7 +534,7 @@ $grayfont: #B4A08C;
     overflow: hidden;
     height: 630px;
     width: 145px;
-    background: url('http://192.168.43.16:25565/ui/wishresult.svg') no-repeat;
+    background: url('http://localhost:25565/ui/wishresult.svg') no-repeat;
     background-size: 100%;
     margin: 0 2px;
     flex-shrink: 0;
@@ -467,9 +548,6 @@ $grayfont: #B4A08C;
     }
     .raritys{
       display: flex;
-      .rarity{
-
-      }
     }
     .characterResult{
       width: 100%;
@@ -482,6 +560,7 @@ $grayfont: #B4A08C;
       mask-image: url('@/assets/ui/wishresult-mask.png');
       mask-position: 0 -1px;
       mask-repeat: no-repeat;
+      filter: drop-shadow(7px 7px 0px #000000AA);
     }
   }
 }
@@ -514,5 +593,93 @@ $grayfont: #B4A08C;
   animation-duration: 0.7s;
   -webkit-animation-name: resultfadeInRight;
   animation-name: resultfadeInRight;
+}
+
+@keyframes itemBackground {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.itemBackground {
+  animation-fill-mode: forwards;
+  animation-duration: 0.5s;
+  animation-delay: 0.6s;
+  -webkit-animation-name: itemBackground;
+  animation-name: itemBackground;
+}
+
+@keyframes itemFadeIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(25px, 0, 0);
+    transform: translate3d(-70px, 0, 0) scale(2);
+    filter: brightness(0);
+  }
+  50% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(-70px, 0, 0) scale(1);
+    filter: brightness(0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) drop-shadow(7px 7px 0px #000000BB);
+  }
+}
+.itemFadeIn {
+  animation-fill-mode: forwards;
+  opacity: 0;
+  animation-duration: 1s;
+  -webkit-animation-name: itemFadeIn;
+  animation-name: itemFadeIn;
+  animation-timing-function: ease;
+}
+
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(25px, 0, 0);
+    transform: translate3d(70px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+.titleFadeIn {
+  animation-fill-mode: forwards;
+  opacity: 0;
+  animation-duration: 0.5s;
+  animation-delay: 0.5s;
+  -webkit-animation-name: titleFadeIn;
+  animation-name: titleFadeIn;
+  animation-timing-function: ease;
+}
+
+@keyframes starFadeIn {
+  from{
+    opacity: 0;
+    transform: scale(2);
+    filter: brightness(1.3);
+  }
+  to{
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+.starFadeIn {
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-duration: 0.5s;
+  -webkit-animation-name: starFadeIn;
+  animation-name: starFadeIn;
+  animation-timing-function: ease;
 }
 </style>

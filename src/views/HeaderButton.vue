@@ -1,6 +1,6 @@
 <template>
   <div class="button">
-    <img :src="'http://192.168.43.16:25565/characters/buttons/5-'+Limits.limits[type].star5.split('-')[1]+'.png'"
+    <img :src="'http://localhost:25565/characters/buttons/5-'+Limits.limits[type].star5.split('-')[1]+'.png'"
     alt="" class="character"
     :class="isSwitch === number ? 'characterActive':''">
   </div>
