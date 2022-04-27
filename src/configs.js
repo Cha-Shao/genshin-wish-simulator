@@ -1,6 +1,6 @@
 export default{
     
-    nowUp: ['gentryOfHermitage2','theHeronsCourt','tapestryOfGoldenFlames','geTanNightmare'],
+    nowUp: ['gentryOfHermitage2','theHeronsCourt','tapestryOfGoldenFlames'],
 
     defaultResult: {
         star5: [

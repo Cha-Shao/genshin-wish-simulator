@@ -1,4 +1,5 @@
 <template>
+  <welcome-toast v-if="welcomePage != 'true'"/>
   <div class="content" v-if="homePage">
     <div class="title">
       <img src="@\assets\ui\wish.svg" alt="祈愿" class="wishIcon">
@@ -7,13 +8,13 @@
     <div class="data">
       <div class="money">
         <img src="@/assets/item/minimumGuarantee.png" alt="" class="intertwinedFate" height="25">
-        <p class="intertwined">{{minimumGuarantee}}</p>
+        <p class="intertwined">{{minimumGuarantee?minimumGuarantee:'0'}}</p>
         <img @click="setMinimumGuarantee()" src="@/assets/ui/add.svg" alt="" class="add">
       </div>
       <div class="money">
-        <img src="@/assets/item/intertwined-fated.png" alt="" class="intertwinedFate" height="25">
-        <p class="intertwined">{{intertwinedFate}}</p>
-        <img @click="supplement(10)" src="@/assets/ui/add.svg" alt="" class="add">
+        <img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">
+        <p class="intertwined">{{intertwinedFate?intertwinedFate:'0'}}</p>
+        <img @click="addInterwinedFate()" src="@/assets/ui/add.svg" alt="" class="add">
       </div>
     </div>
     <div class="header">
@@ -25,56 +26,63 @@
         :isSwitch="isSwitch"
       />
     </div>
+
+    <!-- banner页面在这 -->
     <div class="banners"
     v-for="(banner, i) in Configs.nowUp" :key="i"
     v-show="isSwitch === i">
       <main-banners :banner="banner"/>
     </div>
+
     <div class="footer">
       <div class="smallButtons">
-        <p>投喂</p>
-        <p>详情</p>
-        <p>历史记录</p>
+        <p @click="playSound('button_press')" onclick="window.open('https://mianbaoduo.com/o/bread/mbd-YpiVkpxu')">投喂</p>
+        <p @click="playSound('button_press')" onclick="window.open('https://space.bilibili.com/23265721')">访问作者</p>
+        <p @click="playSound('button_press');" onclick="alert('若发现各种问题\n请按下F12后点击控制台或Console\n并截图所有信息发送到作者邮箱：\ncha_shao@foxmail.com')">未知按钮?</p>
       </div>
       <div class="wishButtons">
-        <div @click="wish(1)"><p>祈愿1次</p><p
+        <div @click="wish(1);playSound('button_press')"><p>祈愿1次</p><p
         :style="intertwinedFate < 1 ? 'color: #FF5F40':''"
-        ><img src="@/assets/item/intertwined-fated.png" alt="" class="intertwinedFate" height="25">x1</p></div>
-        <div @click="wish(10)"><p>祈愿10次</p><p
+        ><img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">x1</p></div>
+        <div @click="wish(10);playSound('button_press')"><p>祈愿10次</p><p
         :style="intertwinedFate < 10 ? 'color: #FF5F40':''"
-        ><img src="@/assets/item/intertwined-fated.png" alt="" class="intertwinedFate" height="25">x10</p></div>
+        ><img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">x10</p></div>
       </div>
     </div>
   </div>
 
   <!-- 视频页 -->
-  <video v-if="wishing" :src="'http://localhost:25565/video/'+resultVideo+'.mp4'" autoplay
+  <video v-if="wishing" :src="require('@/assets/video/'+resultVideo+'.mp4')" autoplay preload
   class="watchVideo"/>
+  <p class="skip" @click="skipVideo();playSound('button_press')" v-if="wishing" style="z-index: 2;">跳过 ></p>
 
   <!-- 预览页 -->
   <div class="viewPage" v-if="viewPage" @click="nextItem()">
-    <audio src="http://localhost:25565/video/result.mp3" ref="resultSound"></audio>
-    <p class="skip" @click="skipView()">跳过 ></p>
-    <div class="viewItems" v-for="(items, i) in result" :key="i"
-    v-show="nowView === i">
-      <div class="info titleFadeIn">
-        <h1>{{items.split('-')[3]}}</h1>
-        <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity starFadeIn"
-        :style="'animation-delay: '+(0.5+i/10)+'s;'"
-        v-for="i in Number(items.split('-')[0])" :key="i" height="35"
-        style="margin: -2px">
+    <audio :src="require('@/assets/video/result_in.wav')" :autoplay="true"></audio>
+    <p class="skip" @click="skipView();playSound('button_press')" v-show="result.length == 10">跳过 ></p>
+    <div class="close" @click="closeResultPage();playSound('button_press')" v-show="result.length == 1"/>
+    <div class="viewItems" v-for="(items, i) in result" :key="i">
+      <div class="itemContainer" v-if="nowView === i">
+        <audio :src="require('@/assets/video/result.wav')" :autoplay="true"></audio>
+        <div class="info titleFadeIn">
+          <h1>{{items.split('-')[3]}}</h1>
+          <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity starFadeIn"
+          :style="'animation-delay: '+(1.2+i/10)+'s;'"
+          v-for="i in Number(items.split('-')[0])" :key="i" height="35"
+          style="margin: -2px">
+        </div>
+        <img :src="require('@/assets/ui/viewpage/'+items.split('-')[2]+'.png')" alt="" class="viewItemBackground itemBackground">
+        <img :src="require('@/assets/characters/'+items.split('-')[0]+'-'+items.split('-')[1]+'.png')" alt="" class="viewItem itemFadeIn">
       </div>
-      <img :src="'http://localhost:25565/ui/viewpage/'+items.split('-')[2]+'.png'" alt="" class="viewItemBackground itemBackground">
-      <img :src="'http://localhost:25565/characters/'+items.split('-')[0]+'-'+items.split('-')[1]+'.png'" alt="" class="viewItem itemFadeIn">
     </div>
   </div>
 
   <!-- 结果页 -->
   <div class="resultPage" v-if="resultPage">
-    <div class="close" @click="closeResultPage()"/>
+    <div class="close" @click="closeResultPage();playSound('button_press')"/>
     <div class="result resultfadeInRight" v-for="(results, i) in result" :key="i"
     :style="'animation-delay: '+i/10+'s;'">
-      <img :src="'http://localhost:25565/ui/icons/'+results.split('-')[2]+'-color.webp'" alt="" class="attribute" height="90">
+      <img :src="require('@/assets/ui/icons/'+results.split('-')[2]+'-color.webp')" alt="" class="attribute" height="90">
       <div class="raritys" style="
           position: absolute;
           z-index: 2;
@@ -87,18 +95,23 @@
         v-for="i in Number(results.split('-')[0])" :key="i" height="23"
         style="margin: -2px">
       </div>
-      <img :src="'http://localhost:25565/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png'" alt="" class="characterResult">
+      <img :src="require('@/assets/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png')" alt="" class="characterResult">
     </div>
   </div>
 </template>
 
 <script setup>
 import Configs from '../configs'
+
 import HeaderButton from './HeaderButton.vue'
 import MainBanners from './MainBanners.vue'
-import { ref } from 'vue'
+import WelcomeToast from './WelcomeToast.vue'
+
+import { ref, onMounted } from 'vue'
 import Limits from '@/limits'
 
+
+const welcomePage = ref(localStorage.getItem('welcomePage'))
 
 
 const isSwitch = ref(0)
@@ -109,7 +122,6 @@ const wishing = ref(false)
 // 预览页
 const viewPage = ref(false)
 const nowView = ref(0)
-let resultSound = ref(null)
 //结果页
 const resultPage = ref(false)
 // 默认视频
@@ -124,18 +136,6 @@ let minimumGuarantee = ref(0)
 
 // 初始化卡池结果
 let result = ref([])
-// let result = ref([
-//     "4-Yanfei-fire",
-//     "4-Yanfei-fire",
-//     "3-Slingshot-bow",
-//     "3-Skyrider_Sword-sword",
-//     "3-Messenger-bow",
-//     "3-Fillet_Blade-sword",
-//     "3-Ferrous_Shadow-sword",
-//     "3-Emerald_Orb-magic",
-//     "3-Black_Tassel-pike",
-//     "3-Black_Tassel-pike"
-// ])
 
 let defaultResult = {
   star5: [],
@@ -143,26 +143,19 @@ let defaultResult = {
   star3: [],
 }
 
-// 第一次设置原石和保底
-function setCache() {
-  localStorage.setItem('intertwinedFate',90)
-  localStorage.setItem('minimumGuarantee',0)
-}
-// 判断浏览器缓存是否存在
-function isCache() {
-  if (localStorage.getItem('intertwinedFate') && localStorage.getItem('minimumGuarantee')) {
-    intertwinedFate.value = localStorage.getItem('intertwinedFate')
-  } else {
-    setCache()
-  }
-}
 
-isCache()
+// isCache()
 // 设置原石和保底
 intertwinedFate = ref(localStorage.getItem('intertwinedFate'))
 minimumGuarantee = ref(localStorage.getItem('minimumGuarantee'))
 
+let goldRate = localStorage.getItem('goldRate')
 
+// 声音函数
+function playSound(sound){
+  let playsound = new Audio(require('@/assets/video/'+sound+'.wav'))
+  playsound.play()
+}
 
 // 切换卡池
 function switchMode(i, type) {
@@ -230,21 +223,28 @@ function startWish(time) {
     
     let random = Math.floor(Math.random() * 1000)
     switch (true) {
+      // 大保底
       case (minimumGuarantee.value % 180 == 0):
         result.value.push(Limits.limits[wishUper.value].star5)
         break
+      // 小保底
       case (minimumGuarantee.value % 90 == 0):
         result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
         break
+      // 紫保底
       case (minimumGuarantee.value % 10 == 9):
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
-      case (0 <= random && random < 10):
+      // 出金
+      case (0 <= random && random < goldRate):
         result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
+        localStorage.setItem('minimumGuarantee',90)
         break;
-      case (6 <= random && random < 100):
+      // 出紫
+      case (goldRate <= random && random < 100):
         result.value.push(defaultResult.star4[Math.floor(Math.random() * defaultResult.star4.length)])
         break;
+      // 出蓝
       case (100 <= random && random < 1000):
         result.value.push(defaultResult.star3[Math.floor(Math.random() * defaultResult.star3.length)])
         break;
@@ -259,8 +259,6 @@ function startWish(time) {
 }
 
 function watchVideo(time, result) {
-  console.log(time, result);
-  console.log('看视频');
   if (time == 1) {
     switch (true) {
       case (result.value[0].split('-')[0] == 5):
@@ -278,16 +276,13 @@ function watchVideo(time, result) {
     }
   }
   else {
-    console.log('多发');
     switch (true) {
       case (result.value.toString().indexOf('5-') != -1):
         // 出金
-        console.log('出金');
         resultVideo.value = '5starwish-export'
         break;
       default:
         // 出紫
-        console.log('出紫');
         resultVideo.value = '4starwish-export'
         break;
     }
@@ -298,29 +293,29 @@ function watchVideo(time, result) {
   nowView.value = 0
   // 6s后跳转
   setTimeout(() => {
-    wishing.value = false
-    // 切换到预览页
-    viewPage.value = true
+    if (wishing.value) skipVideo()
+  }, 6150)
+}
 
-    console.log(resultSound.value);
-    
-  }, 6000)
+function skipVideo(){
+  wishing.value = false
+  // 切换到预览页
+  viewPage.value = true
+  playSound('result_in')
 }
 
 // 下一个物品预览
 function nextItem(){
-
   nowView.value -= -1
   if (nowView.value == 10) {
     skipView()
   }
+  if (result.value.length == 1) closeResultPage()
 }
 
 //跳过
 function skipView() {
     nowView.value = 0
-    viewPage.value = false
-    resultPage.value = true
     
     // 排序result
     result.value.sort()
@@ -329,9 +324,9 @@ function skipView() {
     resultPage.value = true
 }
 
-// 投喂
-function supplement(time){
-  intertwinedFate.value -= -time
+// 加点原石
+function addInterwinedFate(){
+  intertwinedFate.value -= -20
   localStorage.setItem('intertwinedFate',intertwinedFate.value)
 }
 function setMinimumGuarantee(){
@@ -340,6 +335,7 @@ function setMinimumGuarantee(){
 }
 
 function closeResultPage(){
+  viewPage.value = false
   resultPage.value = false
   homePage.value = true
 }
@@ -402,10 +398,10 @@ $grayfont: #B4A08C;
     display: flex;
     justify-content: center;
     .switched{
-      background: url('../assets/ui/buttons/button-active.png') no-repeat;
+      background: url('../assets/ui/buttons/button_active.png') no-repeat;
       transform: scale(1.1);
       &::after{
-        background: url(../assets/ui/buttons/button-active-after.png);
+        background: url(../assets/ui/buttons/button_active_after.png);
       }
       .character{
         transform: translateY(-6px);
@@ -455,7 +451,7 @@ $grayfont: #B4A08C;
     .wishButtons{
       display: flex;
       div{
-        background: url('@/assets/ui/buttons/wish-button.png') no-repeat;
+        background: url('@/assets/ui/buttons/wish_button.png') no-repeat;
         height: 82px;
         width: 350px;
         text-align: center;
@@ -481,43 +477,46 @@ $grayfont: #B4A08C;
   object-position: center center;
 }
 
+.skip{
+  position: absolute;
+  top: 30px;
+  right: 50px;
+  font-size: 1.5em;
+  z-index: 3;
+  color: white;
+}
 .viewPage{
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: url('@/assets/ui/result-background.png');
+  background: url('@/assets/ui/result_background.png');
   position: relative;
-  .skip{
-    position: absolute;
-    top: 30px;
-    right: 50px;
-    font-size: 1.5em;
-    z-index: 3;
-    color: white;
-  }
   .viewItems{
-    display: flex;
-    justify-content: center;
-    .info{
-      position: absolute;
-      z-index: 2;
-      left: 10%;
-      top: 50%;
-      h1{
-        font-size: 4em;
-        color: white;
-        margin: 0;
-        text-shadow: none;
-        font-weight: normal;
+    .itemContainer{
+      display: flex;
+      justify-content: center;
+      .info{
+        position: absolute;
+        z-index: 2;
+        left: 10%;
+        top: 50%;
+        h1{
+          font-size: 4em;
+          color: white;
+          margin: 0;
+          text-shadow: none;
+          font-weight: normal;
+        }
       }
-    }
-    .viewItemBackground{
-      height: 100vh;
-      opacity: 0;
-    }
-    .viewItem{
-      position: absolute;
-      height: 100vh;
+      .viewItemBackground{
+        height: 100vh;
+        opacity: 0;
+      }
+      .viewItem{
+        position: absolute;
+        height: 110vh;
+        top: -5%;
+      }
     }
   }
 }
@@ -527,14 +526,14 @@ $grayfont: #B4A08C;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url('@/assets/ui/result-background.png');
+  background: url('@/assets/ui/result_background.png');
   position: relative;
   overflow: hidden;
   .result{
     overflow: hidden;
     height: 630px;
     width: 145px;
-    background: url('http://localhost:25565/ui/wishresult.svg') no-repeat;
+    background: url('@/assets/ui/wishresult.svg') no-repeat;
     background-size: 100%;
     margin: 0 2px;
     flex-shrink: 0;
@@ -557,7 +556,7 @@ $grayfont: #B4A08C;
       position: relative;
       top: 0%;
       background-size: contain;
-      mask-image: url('@/assets/ui/wishresult-mask.png');
+      mask-image: url('@/assets/ui/wishresult_mask.png');
       mask-position: 0 -1px;
       mask-repeat: no-repeat;
       filter: drop-shadow(7px 7px 0px #000000AA);
@@ -596,17 +595,20 @@ $grayfont: #B4A08C;
 }
 
 @keyframes itemBackground {
-  from {
+  0% {
     opacity: 0;
   }
-  to {
+  6% {
+    opacity: 0;
+  }
+  100% {
     opacity: 1;
   }
 }
 .itemBackground {
   animation-fill-mode: forwards;
-  animation-duration: 0.5s;
-  animation-delay: 0.6s;
+  animation-duration: 0.7s;
+  animation-delay: 0.7s;
   -webkit-animation-name: itemBackground;
   animation-name: itemBackground;
 }
@@ -615,10 +617,16 @@ $grayfont: #B4A08C;
   0% {
     opacity: 0;
     -webkit-transform: translate3d(25px, 0, 0);
-    transform: translate3d(-70px, 0, 0) scale(2);
+    transform: translate3d(-70px, 0, 0) scale(5);
     filter: brightness(0);
   }
-  50% {
+  40% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(-70px, 0, 0) scale(1);
+    filter: brightness(0);
+  }
+  60% {
     opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(-70px, 0, 0) scale(1);
@@ -634,7 +642,7 @@ $grayfont: #B4A08C;
 .itemFadeIn {
   animation-fill-mode: forwards;
   opacity: 0;
-  animation-duration: 1s;
+  animation-duration: 1.4s;
   -webkit-animation-name: itemFadeIn;
   animation-name: itemFadeIn;
   animation-timing-function: ease;
@@ -642,6 +650,11 @@ $grayfont: #B4A08C;
 
 @keyframes titleFadeIn {
   0% {
+    opacity: 0;
+    -webkit-transform: translate3d(25px, 0, 0);
+    transform: translate3d(70px, 0, 0);
+  }
+  50%{
     opacity: 0;
     -webkit-transform: translate3d(25px, 0, 0);
     transform: translate3d(70px, 0, 0);
@@ -655,8 +668,8 @@ $grayfont: #B4A08C;
 .titleFadeIn {
   animation-fill-mode: forwards;
   opacity: 0;
-  animation-duration: 0.5s;
-  animation-delay: 0.5s;
+  animation-duration: 0.6s;
+  animation-delay: 0.6s;
   -webkit-animation-name: titleFadeIn;
   animation-name: titleFadeIn;
   animation-timing-function: ease;
@@ -677,7 +690,7 @@ $grayfont: #B4A08C;
 .starFadeIn {
   opacity: 0;
   animation-fill-mode: forwards;
-  animation-duration: 0.5s;
+  animation-duration: 0.6s;
   -webkit-animation-name: starFadeIn;
   animation-name: starFadeIn;
   animation-timing-function: ease;
