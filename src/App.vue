@@ -20,11 +20,11 @@ $grayfont: #B4A08C;
 }
 
 body{
-  cursor: url('./assets/ui/cursor.png'), pointer;
+  cursor: url('./assets/ui/cursor.webp'), pointer;
   margin: 0;
   background: #272833;
   font-size: 1rem;
-  background: url('@/assets/ui/background.png');
+  background: url('@/assets/ui/background.webp');
 }
 #app {
   font-family: 'hk4e';

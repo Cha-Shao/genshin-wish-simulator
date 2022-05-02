@@ -1,17 +1,17 @@
 <template>
 <div class="container">
     <div class="card">
-        <img src="@/assets/ui/background_horn.png" alt="" class="leftTop">
-        <img src="@/assets/ui/background_horn.png" alt="" class="rightTop">
-        <img src="@/assets/ui/background_horn.png" alt="" class="leftBottom">
-        <img src="@/assets/ui/background_horn.png" alt="" class="rightBottom">
+        <img src="@/assets/ui/background_horn.webp" alt="" class="leftTop">
+        <img src="@/assets/ui/background_horn.webp" alt="" class="rightTop">
+        <img src="@/assets/ui/background_horn.webp" alt="" class="leftBottom">
+        <img src="@/assets/ui/background_horn.webp" alt="" class="rightBottom">
         <div class="hr"></div>
         <h1>欢迎你，旅行者</h1>
         <div class="hr"></div>
         <p class="content">欢迎游玩「祈愿」模拟器！</p>
         <p class="content">这是一份微薄的见面礼，请收下~</p>
         <div style="display: flex;align-items: center;justify-content: center;">
-        <img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="30" @click="setChache()">
+        <img src="@/assets/item/intertwined_fated.webp" alt="" class="intertwinedFate" height="30" @click="setChache()">
         <p class="content">&nbsp;x 180</p>
         </div>
         <p class="button" @click="setChache()">谢谢</p>
@@ -30,7 +30,7 @@ function setChache(){
     // 不再弹出欢迎
     localStorage.setItem('welcomePage', true)
     // 设置金概率
-    localStorage.setItem('goldRate', 10)
+    localStorage.setItem('goldRate', 6)
     // 刷新
     window.location.reload();
 }

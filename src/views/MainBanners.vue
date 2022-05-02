@@ -2,7 +2,7 @@
     <div class="container animated mediumfadeInRight">
         <div class="remarks mediumfadeInRight" :style="'background: #'+Limits.limits[banner].color+';'">角色活动祈愿</div>
         <div class="banner"
-            :style="'background: url('+require('@/assets/ui/banners/banner_'+Limits.limits[banner].attribute+'.png')+')'"
+            :style="'background: url('+require('@/assets/ui/banners/banner_'+Limits.limits[banner].attribute+'.webp')+')'"
         >
             <div class="contents smallfadeInRight">
                 <div class="title textOutline">
@@ -24,11 +24,11 @@
                 </div>
             </div>
             <div class="upCharacter mediumfadeInRight">
-                <img :src="require('@/assets/characters/5-'+Limits.limits[banner].star5.split('-')[1]+'.png')" alt="" class="up">
+                <img :src="require('@/assets/characters/5-'+Limits.limits[banner].star5.split('-')[1]+'.webp')" alt="" class="up">
             </div>
             <div class="characterInfo">
                 <div class="infoTitle">
-                    <img :src="require('@/assets//ui/icons/'+Limits.limits[banner].attribute+'-color.webp')" alt="">
+                    <img :src="require('@/assets//ui/icons/'+Limits.limits[banner].attribute+'-color.svg')" alt="">
                     <div class="title darkTextOutLine">{{Limits.limits[banner].name}}</div>
                 </div>
                 <div class="rarityBG">
@@ -38,7 +38,7 @@
                 <p class="slogan">{{Limits.limits[banner].slogan}}</p>
             </div>
             <div class="subCharacter smallfadeInRight">
-                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="require('@/assets//characters/withoutBackground/4-'+character.split('-')[1]+'.png')" :alt="character" :class="'character'+i">
+                <img v-for="(character, i) in Limits.limits[banner].star4" :key="i" :src="require('@/assets//characters/withoutBackground/4-'+character.split('-')[1]+'.webp')" :alt="character" :class="'character'+i">
             </div>
         </div>
     </div>
@@ -188,6 +188,7 @@ $darkouline: #3A4041;
                 .title{
                     color: white;
                     font-size: 4.3em;
+                    white-space: nowrap;
                     &::after{
                         content: 'UP!';
                         color: #FFFF59;

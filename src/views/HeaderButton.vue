@@ -1,6 +1,6 @@
 <template>
   <div class="button">
-    <img :src="require('@/assets/characters/buttons/5-'+Limits.limits[type].star5.split('-')[1]+'.png')"
+    <img :src="require('@/assets/characters/buttons/5-'+Limits.limits[type].star5.split('-')[1]+'.webp')"
     alt="" class="character"
     :class="isSwitch === number ? 'characterActive':''">
   </div>
@@ -25,7 +25,7 @@ import Limits from '../limits'
 .button{
   transition: 0.1s all;
   position: relative;
-  background: url('../assets/ui/buttons/button_unactive.png') no-repeat;
+  background: url('../assets/ui/buttons/button_unactive.webp') no-repeat;
   max-width: 174px;
   max-height: 81px;
   margin: 0 15px;
@@ -45,7 +45,7 @@ import Limits from '../limits'
     height: 100%;
     width: 100%;
     transition: 0.1s all;
-    background: url('../assets/ui/buttons/button_unactive_after.png') no-repeat;
+    background: url('../assets/ui/buttons/button_unactive_after.webp') no-repeat;
   }
   .character{
     transition: 0.2s all;

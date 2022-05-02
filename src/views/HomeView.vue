@@ -1,5 +1,10 @@
 <template>
   <welcome-toast v-if="welcomePage != 'true'"/>
+  <!-- Issues! -->
+  <info-toast v-if="issuesToast" title="Issues!" :content="['祈愿模拟器处于早期开发阶段','若发现问题请联系作者邮箱:','yrchashao@foxmail.com']" :buttonInfo="[{content: '好的',event: 'window.location.reload()'}]"/>
+  <!-- 投喂 -->
+  <info-toast v-if="feedingToast" title="投喂" :content="['祈愿模拟器处于早期开发阶段','若发现问题请联系作者邮箱:','yrchashao@foxmail.com']" :buttonInfo="[{content: 'A',event: 'window.open(\'https://mianbaoduo.com/o/bread/mbd-YpiVkpxu\')'},{content: 'B', event: ''}]"/>
+
   <div class="content" v-if="homePage">
     <div class="title">
       <img src="@\assets\ui\wish.svg" alt="祈愿" class="wishIcon">
@@ -7,12 +12,12 @@
     </div>
     <div class="data">
       <div class="money">
-        <img src="@/assets/item/minimumGuarantee.png" alt="" class="intertwinedFate" height="25">
+        <img src="@/assets/item/minimumGuarantee.webp" alt="" class="intertwinedFate" height="25">
         <p class="intertwined">{{minimumGuarantee?minimumGuarantee:'0'}}</p>
         <img @click="setMinimumGuarantee()" src="@/assets/ui/add.svg" alt="" class="add">
       </div>
       <div class="money">
-        <img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">
+        <img src="@/assets/item/intertwined_fated.webp" alt="" class="intertwinedFate" height="25">
         <p class="intertwined">{{intertwinedFate?intertwinedFate:'0'}}</p>
         <img @click="addInterwinedFate()" src="@/assets/ui/add.svg" alt="" class="add">
       </div>
@@ -38,15 +43,15 @@
       <div class="smallButtons">
         <p @click="playSound('button_press')" onclick="window.open('https://mianbaoduo.com/o/bread/mbd-YpiVkpxu')">投喂</p>
         <p @click="playSound('button_press')" onclick="window.open('https://space.bilibili.com/23265721')">访问作者</p>
-        <p @click="playSound('button_press');" onclick="alert('若发现各种问题\n请按下F12后点击控制台或Console\n并截图所有信息发送到作者邮箱：\ncha_shao@foxmail.com')">未知按钮?</p>
+        <p @click="playSound('button_press');issuesToast =! issuesToast">BUGS!</p>
       </div>
       <div class="wishButtons">
         <div @click="wish(1);playSound('button_press')"><p>祈愿1次</p><p
         :style="intertwinedFate < 1 ? 'color: #FF5F40':''"
-        ><img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">x1</p></div>
+        ><img src="@/assets/item/intertwined_fated.webp" alt="" class="intertwinedFate" height="25">x1</p></div>
         <div @click="wish(10);playSound('button_press')"><p>祈愿10次</p><p
         :style="intertwinedFate < 10 ? 'color: #FF5F40':''"
-        ><img src="@/assets/item/intertwined_fated.png" alt="" class="intertwinedFate" height="25">x10</p></div>
+        ><img src="@/assets/item/intertwined_fated.webp" alt="" class="intertwinedFate" height="25">x10</p></div>
       </div>
     </div>
   </div>
@@ -65,14 +70,19 @@
       <div class="itemContainer" v-if="nowView === i">
         <audio :src="require('@/assets/video/result.wav')" :autoplay="true"></audio>
         <div class="info titleFadeIn">
-          <h1>{{items.split('-')[3]}}</h1>
-          <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity starFadeIn"
-          :style="'animation-delay: '+(1.2+i/10)+'s;'"
-          v-for="i in Number(items.split('-')[0])" :key="i" height="35"
-          style="margin: -2px">
+          <img :src="require('@/assets/ui/icons/'+items.split('-')[2]+'-view.svg')" alt="" height="100">
+          <div>
+            <h1>{{items.split('-')[3]}}</h1>
+            <img src="@/assets/ui/icons/rarity.svg" alt="⭐" class="rarity starFadeIn"
+            :style="'animation-delay: '+(1.2+i/10)+'s;'"
+            v-for="i in Number(items.split('-')[0])" :key="i" height="35"
+            style="margin: -2px">
+          </div>
         </div>
-        <img :src="require('@/assets/ui/viewpage/'+items.split('-')[2]+'.png')" alt="" class="viewItemBackground itemBackground">
-        <img :src="require('@/assets/characters/'+items.split('-')[0]+'-'+items.split('-')[1]+'.png')" alt="" class="viewItem itemFadeIn">
+        <div style="position: relative">
+          <img :src="require('@/assets/ui/viewpage/'+items.split('-')[2]+'.webp')" alt="" class="viewItemBackground itemBackground">
+          <img :src="require('@/assets/characters/'+items.split('-')[0]+'-'+items.split('-')[1]+'.webp')" alt="" class="viewItem itemFadeIn">
+        </div>
       </div>
     </div>
   </div>
@@ -82,7 +92,7 @@
     <div class="close" @click="closeResultPage();playSound('button_press')"/>
     <div class="result resultfadeInRight" v-for="(results, i) in result" :key="i"
     :style="'animation-delay: '+i/10+'s;'">
-      <img :src="require('@/assets/ui/icons/'+results.split('-')[2]+'-color.webp')" alt="" class="attribute" height="90">
+      <img :src="require('@/assets/ui/icons/'+results.split('-')[2]+'-color.svg')" alt="" class="attribute" height="90">
       <div class="raritys" style="
           position: absolute;
           z-index: 2;
@@ -95,7 +105,7 @@
         v-for="i in Number(results.split('-')[0])" :key="i" height="23"
         style="margin: -2px">
       </div>
-      <img :src="require('@/assets/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.png')" alt="" class="characterResult">
+      <img :src="require('@/assets/characters/result/'+results.split('-')[0]+'-'+results.split('-')[1]+'.webp')" alt="" class="characterResult">
     </div>
   </div>
 </template>
@@ -106,12 +116,15 @@ import Configs from '../configs'
 import HeaderButton from './HeaderButton.vue'
 import MainBanners from './MainBanners.vue'
 import WelcomeToast from './WelcomeToast.vue'
+import InfoToast from './InfoToast.vue'
 
 import { ref, onMounted } from 'vue'
 import Limits from '@/limits'
 
 
 const welcomePage = ref(localStorage.getItem('welcomePage'))
+const issuesToast = ref(false)
+const feedingToast = ref(false)
 
 
 const isSwitch = ref(0)
@@ -398,10 +411,10 @@ $grayfont: #B4A08C;
     display: flex;
     justify-content: center;
     .switched{
-      background: url('../assets/ui/buttons/button_active.png') no-repeat;
+      background: url('../assets/ui/buttons/button_active.webp') no-repeat;
       transform: scale(1.1);
       &::after{
-        background: url(../assets/ui/buttons/button_active_after.png);
+        background: url(../assets/ui/buttons/button_active_after.webp);
       }
       .character{
         transform: translateY(-6px);
@@ -451,7 +464,7 @@ $grayfont: #B4A08C;
     .wishButtons{
       display: flex;
       div{
-        background: url('@/assets/ui/buttons/wish_button.png') no-repeat;
+        background: url('@/assets/ui/buttons/wish_button.webp') no-repeat;
         height: 82px;
         width: 350px;
         text-align: center;
@@ -489,7 +502,7 @@ $grayfont: #B4A08C;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: url('@/assets/ui/result_background.png');
+  background: url('@/assets/ui/result_background.webp');
   position: relative;
   .viewItems{
     .itemContainer{
@@ -500,6 +513,7 @@ $grayfont: #B4A08C;
         z-index: 2;
         left: 10%;
         top: 50%;
+        display: flex;
         h1{
           font-size: 4em;
           color: white;
@@ -509,13 +523,13 @@ $grayfont: #B4A08C;
         }
       }
       .viewItemBackground{
+        position: absolute;
         height: 100vh;
         opacity: 0;
+        left: -140%;
       }
       .viewItem{
-        position: absolute;
-        height: 110vh;
-        top: -5%;
+        height: 100vh;
       }
     }
   }
@@ -526,7 +540,7 @@ $grayfont: #B4A08C;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url('@/assets/ui/result_background.png');
+  background: url('@/assets/ui/result_background.webp');
   position: relative;
   overflow: hidden;
   .result{
@@ -556,7 +570,7 @@ $grayfont: #B4A08C;
       position: relative;
       top: 0%;
       background-size: contain;
-      mask-image: url('@/assets/ui/wishresult_mask.png');
+      mask-image: url('@/assets/ui/wishresult_mask.webp');
       mask-position: 0 -1px;
       mask-repeat: no-repeat;
       filter: drop-shadow(7px 7px 0px #000000AA);
@@ -568,7 +582,7 @@ $grayfont: #B4A08C;
   position: absolute;
   height: 58px;
   width: 58px;
-  background: url('@/assets/ui/close.png');
+  background: url('@/assets/ui/close.webp');
   top: 58px;
   right: 58px;
 }
