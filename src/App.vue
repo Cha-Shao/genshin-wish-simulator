@@ -25,6 +25,7 @@ body{
   background: #272833;
   font-size: 1rem;
   background: url('@/assets/ui/background.webp');
+  user-select: none !important;
 }
 #app {
   font-family: 'hk4e';
