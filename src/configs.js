@@ -11,7 +11,7 @@ export default{
             '5-Jean-wind-琴',
         ],
         star4: [
-            '4-YunJin-stone-云堇',
+            '4-Yunjin-stone-云堇',
             '4-Gorou-stone-五郎',
             '4-Thoma-fire-托马',
             '4-Sara-electric-九条裟罗',

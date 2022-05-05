@@ -1,7 +1,7 @@
 <template>
   <welcome-toast v-if="welcomePage != 'true'"/>
   <!-- Issues! -->
-  <info-toast v-if="issuesToast" title="README!" :content="[['祈愿模拟器处于早期开发阶段','若发现问题请联系作者邮箱:','yrchashao@foxmail.com'],['F12 -> 应用程序 -> 本地存储 -> goldRate 项','改为1000可开启解压模式(，默认为6']]" :buttonInfo="[{content: '知道啦',event: 'window.location.reload()'}]"/>
+  <info-toast v-if="issuesToast" title="README!" :content="[['祈愿模拟器处于早期开发阶段','若发现问题请按下F12截图控制台','并联系作者邮箱:','yrchashao@foxmail.com'],['F12 -> 应用程序 -> 本地存储 -> goldRate 项','改为1000可开启解压模式(，默认为6']]" :buttonInfo="[{content: '知道啦',event: 'window.location.reload()'}]"/>
   <!-- 投喂 -->
   <info-toast v-if="feedingToast" title="投喂" :content="['祈愿模拟器处于早期开发阶段','若发现问题请联系作者邮箱:','yrchashao@foxmail.com']" :buttonInfo="[{content: 'A',event: 'window.open(\'https://mianbaoduo.com/o/bread/mbd-YpiVkpxu\')'},{content: 'B', event: ''}]"/>
 
