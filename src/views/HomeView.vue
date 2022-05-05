@@ -193,6 +193,15 @@ function importResult() {
       defaultResult[i].push(item)
     })
   }
+  // 导入up
+  for (let i = 0; i < Configs.defaultResult.star5.length; i++){
+    defaultResult.star5.push(Limits.limits[wishUper.value].star5)
+  }
+  Limits.limits[wishUper.value].star4.forEach(item => {
+    for (let i = 0; i < Configs.defaultResult.star4.length / 3;i++) {
+      defaultResult.star4.push(item)
+    }
+  })
   // console.log(defaultResult);
 }
 importResult()
@@ -208,15 +217,6 @@ function wish(time){
   }
   
   else {
-    // 导入up
-    for (let i = 0; i < Configs.defaultResult.star5.length; i++){
-      defaultResult.star5.push(Limits.limits[wishUper.value].star5)
-    }
-    Limits.limits[wishUper.value].star4.forEach(item => {
-      for (let i = 0; i < Configs.defaultResult.star4.length / 3;i++) {
-        defaultResult.star4.push(item)
-      }
-    })
     startWish(time)
   }
   localStorage.setItem('intertwinedFate',intertwinedFate.value)
