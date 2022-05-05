@@ -8,9 +8,11 @@
         <div class="hr"></div>
         <h1>{{title}}</h1>
         <div class="hr"></div>
-        <p class="content" v-for="(contents, i) in content" :key="i">
-            {{contents}}
-        </p>
+        <div class="part" v-for="(parts, i) in content" :key="i">
+            <p class="content" v-for="(contents, j) in parts" :key="j">
+                {{contents}}
+            </p>
+        </div>
         <div class="buttonContainer">
             <p class="button" v-for="(buttonStr, i) in buttonInfo" :key="i" :onclick="buttonStr.event">{{buttonStr.content}}</p>
         </div>
@@ -62,9 +64,12 @@ function closePage(menu){
             font-weight: normal;
             margin: 7px 0;
         }
-        .content{
-            font-size: 1.5em;
-            margin: 3px 0;
+        .part{
+            margin: 21px 0;
+            .content{
+                font-size: 1.5em;
+                margin: 3px 0;
+            }
         }
         .buttonContainer{
             display: flex;
@@ -83,7 +88,6 @@ function closePage(menu){
                 transition: 0.2s all;
                 margin-bottom: 0;
                 margin: 0 7px;
-                margin-top: 17px;
                 min-width: 200px;
                 &:hover{
                 border: 3px solid #FEECC6;
