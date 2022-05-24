@@ -250,8 +250,12 @@ function startWish(time) {
         break;
       // 出金
       case (0 <= random && random < goldRate):
-        result.value.push(defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)])
-        localStorage.setItem('minimumGuarantee',90)
+        resultGold = defaultResult.star5[Math.floor(Math.random() * defaultResult.star5.length)]
+        result.value.push(resultGold)
+        if (result.value.toString().indexOf('5') != -1){
+          minimumGuarantee.value = 90
+          localStorage.setItem('minimumGuarantee',90)
+        }
         break;
       // 出紫
       case (goldRate <= random && random < 100):
